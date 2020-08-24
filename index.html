@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Document</title>
+    <!-- BOOTSTRAP VUE IMPORTAR CDN -->
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css"/>
+    <!-- IMPORTAR VUE-->
+    <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div style="background: #000000;">
+            <b-navbar toggleable="lg" type="dark" >
+                <b-navbar-brand href="#"><img src="images/indice.png" class="ml-5" width="140px" alt=""></b-navbar-brand>
+                    <b-navbar-nav class="ml-auto" width="200px">
+                        <b-container fluid>
+                            <b-row style="width: 293px;">
+                                <b-col>
+                                    <b-button pill variant="outline-success">Crear evento</b-button>
+                                </b-col>
+                                <b-col>
+                                    <b-img width="40px" src="images/avatar.svg" rounded="circle" alt="Circle image"></b-img>
+                                </b-col>
+                            </b-row>
+                        </b-container>
+                    </b-navbar-nav>
+            </b-navbar>
+            <!-- DETALLES DEL EVENTO -->
+            <b-card
+                header-tag="header"
+                footer-tag="footer"
+                >
+                    <b-card-body>
+                        <b-card-title>Detalles del evento</b-card-title>
+                        <b-container fluid>
+                            <b-row>
+                                <b-col>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Nombre del evento"
+                                        >
+                                        <b-form-input
+                                            v-model="nuevo_evento.EV_NOMBRE"
+                                            id="input-formatter"
+                                            placeholder="Define un nombre corto y llamativo"
+                                        ></b-form-input>
+                                    </b-form-group>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Elige una categoria"
+                                        >
+                                        <b-form-select v-model="nuevo_evento.ID_CATEG"  :options="array_categorias" text-field="CAT_DESC" value-field="ID_CAT"></b-form-select>
+                                    </b-form-group>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Descripción del evento *"
+                                        >
+                                        <b-form-textarea
+                                            v-model="nuevo_evento.EV_DESC"
+                                            id="textarea-rows"
+                                            placeholder="Escribe un párrafo corto pero potente que describa tu evento (Punchline)"
+                                            rows="1"
+                                        ></b-form-textarea>
+                                    </b-form-group>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Información adicional"
+                                        >
+                                        <b-form-textarea
+                                            id="textarea-rows"
+                                            v-model="nuevo_evento.EV_INFO"
+                                            placeholder="Dale a los usuarios más información: detalles del evento, panelistas, links relacionados, cronograma del evento, etc."
+                                            rows="6"
+                                        ></b-form-textarea>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Información adicional"
+                                        >
+                                        <b-form-file v-model="imagen" accept="image/jpeg, image/png, image/gif" ref="file-input"  @change="insertar_image"></b-form-file>
+                                    </b-form-group>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Video"
+                                        >
+                                        <b-form-input
+                                            id="input-formatter"
+                                            placeholder="Copia el link de tu video youtube"
+                                        ></b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                        </b-container>
+                        <b-container>
+                            <b-row>
+                                <!-- FECHA DE INICIO -->
+                                <b-col>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Fecha de inicio del evento"
+                                        >
+                                        <b-row>
+                                            <b-col cols="2"><b-form-select size="sm" v-model="dia_inicio"  :options="array_dias"></b-form-select></b-col>
+                                            <b-col>
+                                                <b-input-group size="sm" prepend="de">
+                                                    <b-form-select   :options="array_meses" v-model="mes_inicio"></b-form-select>
+                                                </b-input-group>
+                                            </b-col>
+                                            <b-col>
+                                                <b-input-group size="sm" prepend="de">
+                                                    <b-form-select   :options="array_anios" v-model="año_inicio"></b-form-select>
+                                                </b-input-group>
+                                            </b-col>
+                                            <b-col><b-form-select size="sm"   :options="array_horas"></b-form-select></b-col>
+                                            <b-col><b-form-select size="sm"  :options="array_minutos"></b-form-select></b-col>
+                                        </b-row>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                            <b-row>
+                                <b-col>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="El evento finaliza en"
+                                        >
+                                        <b-row>
+                                            <b-col cols="2"><b-form-select size="sm" v-model="dia_fin"  :options="array_dias"></b-form-select></b-col>
+                                            <b-col>
+                                                <b-input-group size="sm" prepend="de">
+                                                    <b-form-select   v-model="mes_fin" :options="array_meses"></b-form-select>
+                                                </b-input-group>
+                                            </b-col>
+                                            <b-col>
+                                                <b-input-group size="sm" prepend="de">
+                                                    <b-form-select v-model="año_fin"  :options="array_anios"></b-form-select>
+                                                </b-input-group>
+                                            </b-col>
+                                            <b-col><b-form-select size="sm"   :options="array_horas"></b-form-select></b-col>
+                                            <b-col><b-form-select size="sm"  :options="array_minutos"></b-form-select></b-col>
+                                        </b-row>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                        </b-container>
+                        <b-container>
+                            <b-row>
+                                <b-col>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Visibilidad"
+                                        >
+                                        <b-form-checkbox-group
+                                        :options="opciones_visibilidad"
+                                        name="flavour-1"
+                                    ></b-form-checkbox-group>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Restricción"
+                                        >
+                                        <b-form-checkbox-group
+                                        :options="opciones_restriccion"
+                                        name="flavour-1"
+                                    ></b-form-checkbox-group>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                        </b-container>
+                    </b-card-body>
+            </b-card>
+            <b-card>
+                <b-card-body>
+                    <b-card-title>Ubicación</b-card-title>
+                    <b-container fluid>
+                        <b-row>
+                            <b-col>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Ciudad *"
+                                        >
+                                        <b-form-select v-model="nuevo_evento.ID_CIU"  :options="array_ciudades" text-field="CIUDAD" value-field="ID_CIU"></b-form-select>
+                                    </b-form-group>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Dirección *"
+                                        >
+                                        <b-form-input
+                                            id="input-formatter"
+                                            placeholder="Escribe la dirección donde será el evento."
+                                            v-model="nuevo_evento.EV_DIREC"
+                                        ></b-form-input>
+                                    </b-form-group>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="Referencia *"
+                                        >
+                                        <b-form-input
+                                            v-model="nuevo_evento.EV_REF"
+                                            id="input-formatter"
+                                            placeholder="Ej. A 3 cuadras de la librería pública"
+                                        ></b-form-input>
+                                    </b-form-group>
+                                    <b-form-group
+                                        class="mb-3"
+                                        label="¿Como encontrarnos? *"
+                                        >
+                                        <b-form-input
+                                            v-model="nuevo_evento.EV_ENCU"
+                                            id="input-formatter"
+                                            placeholder="Ej. Estaré con una camisa azul"
+                                        ></b-form-input>
+                                    </b-form-group>
+                            </b-col>
+                            <b-col>
+                            </b-col>
+                        </b-row>
+                    </b-container>
+            </b-card>
+            <!-- CREAR ENTRADAS -->
+            <b-card
+            header-tag="header"
+            footer-tag="footer"
+            >
+                <b-card-body>
+                    <b-card-title>Crear Entradas</b-card-title>
+                    <b-container fluid>
+                        <b-row class="mb-3">
+                            <b-col><b-form-select size="sm"   :options="array_monedas"></b-form-select></b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col>
+                                <b-form-group
+                                    class="mb-3"
+                                    label="Nombre de la entrada *"
+                                    >
+                                    <b-form-input
+                                        id="input-formatter"
+                                        placeholder="Ej. Gratis, VIP, Preventa"
+                                    ></b-form-input>
+                                </b-form-group>
+                            </b-col>
+                            <b-col>
+                                <b-form-group
+                                class="mb-3"
+                                label="Cantidad disponible *"
+                                >
+                                    <b-form-input
+                                    id="input-formatter"
+                                    placeholder="0"
+                                    ></b-form-input>
+                                </b-form-group>
+                            </b-col>
+                            <b-col>
+                                <b-form-group
+                                class="mb-3"
+                                label="Precio *"
+                                >
+                                    <b-form-input
+                                    id="input-formatter"
+                                    placeholder="0.00"
+                                    ></b-form-input>
+                                </b-form-group>
+                            </b-col>
+                            <b-col style="display: flex;justify-content: center;align-items: center;">
+                                <b-button v-b-toggle href="#example-collapse" @click.prevent>↓</b-button>
+                            </b-col>
+                        </b-row>
+                        <!-- AÑADIR INFORMACIÖN DE ENTRADA -->
+                        <b-row>
+                            <b-col>
+                                <b-collapse id="example-collapse">
+                                    <b-card>
+                                        <b-container >
+                                            <b-row>
+                                                <b-col>
+                                                    <b-form-group
+                                                    class="mb-3"
+                                                    label="Min cantidad por orden *"
+                                                    >
+                                                        <b-form-input
+                                                        id="input-formatter"
+                                                        placeholder="0.00"
+                                                        ></b-form-input>
+                                                    </b-form-group>
+                                                </b-col>
+                                                <b-col>
+                                                    <b-form-group
+                                                    class="mb-3"
+                                                    label="Max cantidad por orden *"
+                                                    >
+                                                        <b-form-input
+                                                        id="input-formatter"
+                                                        placeholder="0.00"
+                                                        ></b-form-input>
+                                                    </b-form-group>
+                                                </b-col>
+                                                <b-col>
+                                                    <b-form-group
+                                                    class="mb-3"
+                                                    label="Max cant. por usuario *"
+                                                    >
+                                                        <b-form-input
+                                                        id="input-formatter"
+                                                        placeholder="0.00"
+                                                        ></b-form-input>
+                                                    </b-form-group>
+                                                </b-col>
+                                            </b-row>
+                                        </b-container>
+                                    </b-card>
+                                </b-collapse>
+                            </b-col>
+                        </b-row>
+                    </b-container>
+                </b-card-body>
+            </b-card>
+            <b-card>
+                <b-container>
+                    <b-row>
+                        <b-col>
+                            <b-form-group
+                                class="mb-3"
+                                label="Visibilidad"
+                                >
+                                <b-form-checkbox-group
+                                :options="opciones_terminos"
+                                name="flavour-1"
+                            ></b-form-checkbox-group>
+                            </b-form-group>
+                        </b-col>
+                    </b-row>
+                </b-container>
+            </b-card>
+            <b-card>
+                <b-container>
+                    <b-row>
+                        <b-col md="9">
+                            <p> ¡Después de crear tu evento podrás invitar a tus amigos y compartirla en tus redes sociales! </p>
+                        </b-col>
+                        <b-col>
+                            <b-button block  variant="success" @click="guardar_evento()">Publicar Evento</b-button>
+                        </b-col>
+                    </b-row>
+                </b-container>
+            </b-card>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                nuevo_evento:{
+                    ID_EV: Math.floor((Math.random() * 100) + 1),
+                    EV_NOMBRE:'',
+                    EV_DESC:'',
+                    EV_INFO:'',
+                    EV_FECINICIO:'',
+                    EV_FECFIN:'',
+                    EV_DIREC:'',
+                    EV_REF:'',
+                    EV_ENCU:'',
+                    ID_CATEG:'',
+                    ID_USU:'1',
+                    ID_CIU:'',
+                },
+                dia_inicio:'',
+                mes_inicio:'',
+                año_inicio:'',
+                dia_fin:'',
+                mes_fin:'',
+                año_fin:'',
+                sel:null,
+                imagen:null,
+                array_categorias: [],
+                opciones_visibilidad:[
+                    { text: 'Público (Se publicará este evento en Joinnus)', value: '0' },
+                    { text: 'Privado (No se mostrará este evento públicamente)', value: '1' },
+                ],
+                opciones_restriccion:[
+                    { text: 'Apto para público en general.', value: '0' },
+                    { text: 'Apto para menores de 18 años en compañía de un adulto.', value: '1' },
+                    { text: 'Apto solo para mayores de 18 años.', value: '2' },
+                ],
+                array_dias:[
+                    {value: '1', text: '1'},
+                    {value: '2', text: '2'},
+                    {value: '3', text: '3'},
+                    {value: '4', text: '4'},
+                    {value: '5', text: '5'},
+                    {value: '6', text: '6'},
+                    {value: '7', text: '7'},
+                    {value: '8', text: '8'},
+                    {value: '9', text: '9'},
+                    {value: '10', text: '10'},
+                    {value: '11', text: '11'},
+                    {value: '12', text: '12'},
+                    {value: '13', text: '13'},
+                    {value: '14', text: '14'},
+                    {value: '15', text: '15'},
+                    {value: '16', text: '16'},
+                    {value: '17', text: '17'},
+                    {value: '18', text: '18'},
+                    {value: '19', text: '19'},
+                    {value: '20', text: '20'},
+                    {value: '21', text: '21'},
+                    {value: '22', text: '22'},
+                    {value: '23', text: '23'},
+                    {value: '24', text: '24'},
+                    {value: '25', text: '25'},
+                    {value: '26', text: '26'},
+                    {value: '27', text: '27'},
+                    {value: '28', text: '28'},
+                    {value: '19', text: '19'},
+                    {value: '30', text: '30'},
+                    {value: '31', text: '31'},
+                ],
+                array_meses:[
+                    {value:'01',text:'Enero'},
+                    {value:'02',text:'Febrero'},
+                    {value:'03',text:'Marzo'},
+                    {value:'04',text:'Abril'},
+                    {value:'05',text:'Mayo'},
+                    {value:'06',text:'Junio'},
+                    {value:'07',text:'Julio'},
+                    {value:'08',text:'Agosto'},
+                    {value:'09',text:'Septiembre'},
+                    {value:'10',text:'Octubre'},
+                    {value:'11',text:'Noviembre'},
+                    {value:'12',text:'Diciembre'},
+                ],
+                array_anios:[
+                    {value:'2020',text:'2020'},
+                    {value:'2021',text:'2021'},
+                    {value:'2022',text:'2022'},
+                ],
+                array_horas:[
+                    {value: '0', text: '0'},
+                    {value: '1', text: '1'},
+                    {value: '2', text: '2'},
+                    {value: '3', text: '3'},
+                    {value: '4', text: '4'},
+                    {value: '5', text: '5'},
+                    {value: '6', text: '6'},
+                    {value: '7', text: '7'},
+                    {value: '8', text: '8'},
+                    {value: '9', text: '9'},
+                    {value: '10', text: '10'},
+                    {value: '11', text: '11'},
+                    {value: '12', text: '12'},
+                    {value: '13', text: '13'},
+                    {value: '14', text: '14'},
+                    {value: '15', text: '15'},
+                    {value: '16', text: '16'},
+                    {value: '17', text: '17'},
+                    {value: '18', text: '18'},
+                    {value: '19', text: '19'},
+                    {value: '20', text: '20'},
+                    {value: '21', text: '21'},
+                    {value: '22', text: '22'},
+                    {value: '23', text: '23'},
+                ],
+                array_minutos:[
+                    { value :'0',text:'0'},{ value :'1',text:'1'},{ value :'2',text:'2'},{ value :'3',text:'3'},{ value :'4',text:'4'},{ value :'5',text:'5'},{ value :'6',text:'6'},{ value :'7',text:'7'},{ value :'8',text:'8'},{ value :'9',text:'9'},{ value :'10',text:'10'},{ value :'11',text:'11'},{ value :'12',text:'12'},{ value :'13',text:'13'},{ value :'14',text:'14'},{ value :'15',text:'15'},{ value :'16',text:'16'},{ value :'17',text:'17'},{ value :'18',text:'18'},{ value :'19',text:'19'},{ value :'20',text:'20'},{ value :'21',text:'21'},{ value :'22',text:'22'},{ value :'23',text:'23'},{ value :'24',text:'24'},{ value :'25',text:'25'},{ value :'26',text:'26'},{ value :'27',text:'27'},{ value :'28',text:'28'},{ value :'29',text:'29'},{ value :'30',text:'30'},{ value :'31',text:'31'},{ value :'32',text:'32'},{ value :'33',text:'33'},{ value :'34',text:'34'},{ value :'35',text:'35'},{ value :'36',text:'36'},{ value :'37',text:'37'},{ value :'38',text:'38'},{ value :'39',text:'39'},{ value :'40',text:'40'},{ value :'41',text:'41'},{ value :'42',text:'42'},{ value :'43',text:'43'},{ value :'44',text:'44'},{ value :'45',text:'45'},{ value :'46',text:'46'},{ value :'47',text:'47'},{ value :'48',text:'48'},{ value :'49',text:'49'},{ value :'50',text:'50'},{ value :'51',text:'51'},{ value :'52',text:'52'},{ value :'53',text:'53'},{ value :'54',text:'54'},{ value :'55',text:'55'},{ value :'56',text:'56'},{ value :'57',text:'57'},{ value :'58',text:'58'},,{ value :'58',text:'59'}
+                ],
+                array_ciudades:[],
+                array_monedas:[
+                    { text: 'Soles', value: '0' },
+                    { text: 'Dolares', value: '1' },
+                ],opciones_terminos:[
+                    { text: 'He leído y acepto los Términos y Condiciones.', value: '0' },
+                    { text: '¿Usted ha leído y acepta los términos y condiciones para el tratamiento de sus datos personales contenidos en la Política de Privacidad Web? ', value: '1' },
+                    { text: 'He leído y acepto los términos y condiciones para publicar mi evento. Además, certifico la veracidad de la información ingresada y asumo la absoluta responsabilidad por el evento.', value: '2' },
+                    { text: 'Confirmo que tengo los derechos de uso de la información y las imágenes que subiré en la plataforma, así como el consentimiento de uso de datos personales de terceros, autorizando a JOINNUS para su divulgación conforme a los Términos y Condiciones y Politica de Privacidad. ', value: '3' },
+                ],
+            },
+            methods: {
+                insertar_image(){
+                    let vue=this;
+                    
+                    console.log(vue.$refs['file-input']);
+                },
+                guardar_evento(){
+                    let vue = this;
+                    vue.nuevo_evento.EV_FECINICIO = vue.año_inicio+'-'+vue.mes_inicio+'-'+vue.dia_inicio;
+                    vue.nuevo_evento.EV_FECFIN = vue.año_fin+'-'+vue.mes_fin+'-'+vue.dia_fin;
+                    //HACER PETICION 
+                    fetch('http://localhost:55452/api/Evento/PublicarEvento', {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        method: 'POST',
+                        body: JSON.stringify(vue.nuevo_evento)
+                    })
+                    .then(function(response) {
+                        response.json().then((data) => {
+                            alert("El evento "+data.EV_NOMBRE+" se ha creado correctamente");
+                        });
+                    })
+                },obtener_ciudades(){
+                    let vue=this;
+                    fetch('http://localhost:55452/api/AfiliacionUsuario/ListarCiudades?id_pais=1',{
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        method: 'GET',
+                    })
+                    .then(function (response) {
+                        response.json().then((data) => {
+                            vue.array_ciudades=data;
+                        });
+                    })
+                },obtener_categorias(){
+                    let vue=this;
+                    fetch('http://localhost:55452/api/publicar/categoria',{
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        method: 'GET',
+                    })
+                    .then(function (response) {
+                        response.json().then((data) => {
+                            vue.array_categorias=data;
+                            console.log(data);
+                        });
+                    })
+                }
+            },mounted() {
+                this.obtener_ciudades();
+                this.obtener_categorias();
+            },
+        })
+    </script>
+</body>
+</html>
